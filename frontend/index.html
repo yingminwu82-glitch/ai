@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>美甲虚拟试戴和智能运营</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <main class="app">
+
+    <!-- 顶部 -->
+    <header class="app__header">
+      <h1 class="app__title">美甲虚拟试戴和智能运营</h1>
+      <p class="app__subtitle">选一款 · 上传手部照片 · AI 推荐 · 智能试戴</p>
+    </header>
+
+    <!-- 主体：左侧流程区，右侧 Chatbot -->
+    <div class="app__body">
+
+      <!-- 左侧流程区 -->
+      <section class="flow">
+
+        <!-- 步骤 1: 选款式 -->
+        <div class="step" id="step1">
+          <div class="step__head">
+            <span class="step__num">01</span>
+            <span class="step__title">选一款美甲</span>
+            <span class="step__hint" id="styleHint">14 款中选 1 款</span>
+          </div>
+          <div class="gallery" id="gallery">
+            <!-- 14 款式由 JS 渲染 -->
+          </div>
+          <div class="recommend-row">
+            <button class="btn-recommend" id="recommendBtn">不知道选哪款？让 AI 分析推荐</button>
+            <span class="recommend-reason" id="recommendReason"></span>
+          </div>
+        </div>
+
+        <!-- AI 分析结果区 -->
+        <div class="ai-analysis" id="aiAnalysis" hidden>
+          <div class="ai-analysis__head">
+            <span class="ai-analysis__title">AI 看见你的手</span>
+            <button class="ai-analysis__close" id="analysisClose">×</button>
+          </div>
+          <div class="ai-analysis__tags" id="analysisTags">
+            <span class="ai-tag"><span class="ai-tag__label">肤色</span><span class="ai-tag__value" id="tagSkin">-</span></span>
+            <span class="ai-tag"><span class="ai-tag__label">手型</span><span class="ai-tag__value" id="tagHand">-</span></span>
+            <span class="ai-tag"><span class="ai-tag__label">指甲</span><span class="ai-tag__value" id="tagNail">-</span></span>
+            <span class="ai-tag"><span class="ai-tag__label">场景</span><span class="ai-tag__value" id="tagScene">-</span></span>
+          </div>
+          <div class="ai-recommend__list" id="recommendList"></div>
+        </div>
+
+        <!-- 步骤 2: 上传 -->
+        <div class="step" id="step2">
+          <div class="step__head">
+            <span class="step__num">02</span>
+            <span class="step__title">上传手部照片</span>
+            <span class="step__hint">单手展示效果最佳</span>
+          </div>
+          <div class="dropzone" id="dropzone">
+            <input type="file" id="fileInput" accept="image/*" hidden>
+            <div class="dropzone__inner" id="dropzoneInner">
+              <div class="dropzone__icon">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M12 5v14M5 12l7-7 7 7"/>
+                </svg>
+              </div>
+              <div class="dropzone__text">点击或拖拽上传</div>
+              <div class="dropzone__sub">JPG / PNG · ≤ 5MB</div>
+            </div>
+            <img class="dropzone__preview" id="preview" alt="">
+          </div>
+        </div>
+
+        <!-- 步骤 3: 试戴按钮 -->
+        <div class="step step--action" id="step3">
+          <button class="btn-tryon" id="tryOnBtn" disabled>
+            <span class="btn-tryon__label">试戴</span>
+            <span class="btn-tryon__sub" id="tryOnHint">选款式 + 上传照片</span>
+          </button>
+          <button class="btn-white-preview" id="whitePreviewBtn" disabled>白模预览</button>
+          <button class="btn-reset" id="resetBtn" hidden>换一张</button>
+        </div>
+        <div class="tuning-panel" id="tuningPanel">
+          <label class="tuning-control">
+            <span>宽度 <b id="widthValue">100%</b></span>
+            <input type="range" id="widthScale" min="0.65" max="1.35" step="0.05" value="1">
+          </label>
+          <label class="tuning-control">
+            <span>长度 <b id="lengthValue">100%</b></span>
+            <input type="range" id="lengthScale" min="0.65" max="1.55" step="0.05" value="1">
+          </label>
+          <label class="tuning-control">
+            <span>位置 <b id="offsetValue">0</b></span>
+            <input type="range" id="offsetScale" min="-0.35" max="0.35" step="0.05" value="0">
+          </label>
+          <label class="tuning-control">
+            <span>透明度 <b id="opacityValue">92%</b></span>
+            <input type="range" id="opacityScale" min="0.45" max="1" step="0.05" value="0.92">
+          </label>
+        </div>
+
+        <!-- 步骤 4: 结果 -->
+        <div class="step step--result" id="result" hidden>
+          <div class="step__head">
+            <span class="step__num">03</span>
+            <span class="step__title">试戴效果</span>
+            <span class="step__hint" id="resultHint"></span>
+          </div>
+          <div class="result__grid">
+            <div class="result__pane">
+              <div class="result__pane-label">原图</div>
+              <img class="result__img" id="resultOriginal" alt="原图">
+            </div>
+            <div class="result__divider">→</div>
+            <div class="result__pane">
+              <div class="result__pane-label">试戴 #<span id="styleBadge">-</span></div>
+              <img class="result__img" id="resultGenerated" alt="试戴效果">
+            </div>
+          </div>
+          <div class="result__meta">
+            <span class="result__pill" id="nailCount">检测指甲 - 个</span>
+            <span class="result__pill result__pill--accent" id="styleName">-</span>
+          </div>
+          <div class="style-advice" id="styleAdvice" hidden>
+            <div class="style-advice__score">适配度 <span id="fitScore">-</span></div>
+            <div class="style-advice__text" id="fitText"></div>
+            <div class="style-advice__text" id="trendText"></div>
+          </div>
+        </div>
+
+        <!-- 加载中 -->
+        <div class="loader" id="loader" hidden>
+          <div class="loader__steps">
+            <div class="loader__step" data-step="0">
+              <span class="loader__dot"></span>
+              <span class="loader__label">识别手部</span>
+            </div>
+            <div class="loader__step" data-step="1">
+              <span class="loader__dot"></span>
+              <span class="loader__label">定位指甲</span>
+            </div>
+            <div class="loader__step" data-step="2">
+              <span class="loader__dot"></span>
+              <span class="loader__label">合成甲面</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 右侧 Chatbot -->
+      <aside class="chatbot" id="chatbot">
+        <div class="chatbot__head">
+          <span class="chatbot__dot"></span>
+          <span class="chatbot__title">美甲顾问</span>
+        </div>
+        <div class="chatbot__messages" id="chatMessages">
+          <div class="msg msg--bot">
+            <div class="msg__bubble">
+              你好，选好款式 + 上传照片后，可以问我关于款式/搭配/场合的问题。
+            </div>
+          </div>
+        </div>
+        <div class="chatbot__input">
+          <input type="text" id="chatInput" placeholder="问点什么…" maxlength="200">
+          <button id="chatSend" class="chatbot__send" disabled>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12l14 0M13 6l6 6-6 6"/>
+            </svg>
+          </button>
+        </div>
+      </aside>
+
+    </div>
+
+    <footer class="footer">
+      <span>指尖灵感 · 试戴系统</span>
+      <button class="footer__save" id="saveBtn" hidden>保存结果图</button>
+    </footer>
+
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>

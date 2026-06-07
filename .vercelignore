@@ -1,0 +1,34 @@
+.git/
+.vercel/
+.DS_Store
+
+# Secrets and local env
+.env
+backend/.env
+*.key
+*.pem
+
+# Local-only model weights and generated diagnostics
+models/
+test_b_grade/
+assets/test/
+assets/hand-samples/
+assets/samples/
+assets/nail-tips/
+assets/nail-tips-v2/
+assets/nail-tips-v3/
+assets/nail-tips-v4/
+assets/nail-tips-generated/
+*.log
+
+# Python/editor caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
+.idea/
+.vscode/

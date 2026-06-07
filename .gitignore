@@ -1,0 +1,31 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Secrets
+.env
+backend/.env
+*.key
+*.pem
+
+# Local/runtime outputs
+assets/test/
+test_b_grade/
+*.log
+
+# Heavy model weights. Download or place these locally before running SAM.
+models/*.pth
+models/*.pt
+models/*.ckpt
+models/*.onnx
+
+# Virtual environments and editor state
+.venv/
+venv/
+env/
+.idea/
+.vscode/
+.vercel
